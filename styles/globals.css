@@ -823,4 +823,9 @@ checkout-btn:active:not(:disabled) {
   cursor: pointer;
 }
 
+.hide-cart .app-cart {
+  display: none;
+}
+
+
 
