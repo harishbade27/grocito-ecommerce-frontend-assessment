@@ -1,52 +1,59 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { useCart } from "../../context/CartContext";
 import SkeletonProductDetail from "../../components/SkeletonProductDetail";
 
-export async function getServerSideProps(context) {
-  const { id } = context.params;
+export default function ProductDetailPage() {
+  const router = useRouter();
+  const { id } = router.query;
 
-  try {
-    const res = await fetch(`https://fakestoreapi.com/products/${id}`);
-
-    if (!res.ok) {
-
-      return {
-        props: {
-          product: null,
-          error: "We couldn’t load this product right now. Please try again.",
-        },
-      };
-    }
-
-    const product = await res.json();
-
-    return {
-      props: {
-        product,
-        error: null,
-      },
-    };
-  } catch (e) {
-
-    return {
-      props: {
-        product: null,
-        error: "We couldn’t load this product right now. Please try again.",
-      },
-    };
-  }
-}
-
-
-export default function ProductDetailPage({ product, error }) {
   const { addItem } = useCart();
-  const [isClient, setIsClient] = useState(false);
+  const [product, setProduct] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    if (!id) return;
+
+    setLoading(true);
+    setError("");
+
+    fetch(`https://fakestoreapi.com/products/${id}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to load product");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setProduct(data);
+      })
+      .catch(() => {
+        setError("We couldn’t load this product right now. Please try again.");
+        setProduct(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [id]);
+
+  const handleAddToCart = () => {
+    if (!product) return;
+    addItem({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      image: product.image,
+    });
+  };
+
+
+  if (loading) {
+    return <SkeletonProductDetail />;
+  }
+
 
   if (error) {
     return (
@@ -71,6 +78,7 @@ export default function ProductDetailPage({ product, error }) {
     );
   }
 
+
   if (!product) {
     return (
       <div className="error-page">
@@ -88,15 +96,6 @@ export default function ProductDetailPage({ product, error }) {
   const seoTitle = `${product.title} | Grocito`;
   const seoDescription = product.description.slice(0, 150);
 
-  const handleAddToCart = () => {
-    addItem({
-      id: product.id,
-      title: product.title,
-      price: product.price,
-      image: product.image,
-    });
-  };
-
   return (
     <>
       <Head>
@@ -108,36 +107,30 @@ export default function ProductDetailPage({ product, error }) {
       </Head>
 
       <article className="product-detail">
-        {!isClient ? (
-          <SkeletonProductDetail />
-        ) : (
-          <>
-            <div className="product-detail-image-wrapper">
-              <img
-                src={product.image}
-                alt={product.title}
-                loading="lazy"
-                className="product-detail-image"
-              />
-            </div>
-            <div className="product-detail-info">
-              <h1>{product.title}</h1>
-              <p className="product-detail-price">
-                Price: ₹{product.price.toFixed(2)}
-              </p>
-              <p className="product-detail-description">
-                {product.description}
-              </p>
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                className="add-to-cart-btn"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </>
-        )}
+        <div className="product-detail-image-wrapper">
+          <img
+            src={product.image}
+            alt={product.title}
+            loading="lazy"
+            className="product-detail-image"
+          />
+        </div>
+        <div className="product-detail-info">
+          <h1>{product.title}</h1>
+          <p className="product-detail-price">
+            Price: ₹{product.price.toFixed(2)}
+          </p>
+          <p className="product-detail-description">
+            {product.description}
+          </p>
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            className="add-to-cart-btn"
+          >
+            Add to Cart
+          </button>
+        </div>
       </article>
     </>
   );
