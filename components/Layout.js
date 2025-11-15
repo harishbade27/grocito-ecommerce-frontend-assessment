@@ -54,11 +54,11 @@ export default function Layout({ children }) {
           </Link>
         </div>
 
-        <nav aria-label="Main navigation">
+        {/*<nav aria-label="Main navigation">
           <Link href="/" className="nav-link">
             Products
           </Link>
-        </nav>
+        </nav>*/}
 
         <button
           type="button"

@@ -7,17 +7,38 @@ import { useCart } from "../context/CartContext";
 
 // SSR: fetch all products
 export async function getServerSideProps() {
-    const res = await fetch("https://fakestoreapi.com/products");
-    const products = await res.json();
+    try {
+        const res = await fetch("https://fakestoreapi.com/products");
 
-    return {
-        props: {
-            products,
-        },
-    };
+        if (!res.ok) {
+            return {
+                props: {
+                    products: [],
+                    error: "Failed to load products. Please try again later.",
+                },
+            };
+        }
+
+        const products = await res.json();
+
+        return {
+            props: {
+                products,
+                error: null,
+            },
+        };
+    } catch (e) {
+        console.error("Error fetching products:", e);
+        return {
+            props: {
+                products: [],
+                error: "Unable to fetch products at this time.",
+            },
+        };
+    }
 }
 
-export default function HomePage({ products }) {
+export default function HomePage({ products, error }) {
     const { addItem } = useCart();
 
     const [search, setSearch] = useState("");
@@ -32,6 +53,24 @@ export default function HomePage({ products }) {
     useEffect(() => {
         setIsClient(true);
     }, []);
+
+    if (error) {
+        return (
+            <div className="error-page">
+                <div className="error-card">
+                    <h2>Something went wrong</h2>
+                    <p>{error}</p>
+                    <button
+                        type="button"
+                        onClick={() => window.location.reload()}
+                        className="error-btn"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     const categories = useMemo(() => {
         const set = new Set();
