@@ -13,7 +13,7 @@ export default function handler(req, res) {
   }
 
   // Simulate random success/failure
-  const isSuccess = Math.random() > 0.2; // 80% success
+  const isSuccess = Math.random() > 0.2;
 
   if (!isSuccess) {
     return res
@@ -21,7 +21,6 @@ export default function handler(req, res) {
       .json({ success: false, message: "Payment gateway error" });
   }
 
-  // In a real app you would create an order, etc.
   return res.status(200).json({
     success: true,
     message: "Order created successfully",
