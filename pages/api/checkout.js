@@ -1,3 +1,9 @@
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
+
 export default function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ success: false, message: "Method not allowed" });
@@ -5,14 +11,12 @@ export default function handler(req, res) {
 
   const { items, total } = req.body || {};
 
-  // Basic validation
   if (!Array.isArray(items) || typeof total !== "number") {
     return res
       .status(400)
       .json({ success: false, message: "Invalid request payload" });
   }
 
-  // Simulate random success/failure
   const isSuccess = Math.random() > 0.2;
 
   if (!isSuccess) {
