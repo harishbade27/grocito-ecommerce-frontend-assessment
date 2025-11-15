@@ -11,7 +11,13 @@ export async function getServerSideProps(context) {
     const res = await fetch(`https://fakestoreapi.com/products/${id}`);
 
     if (!res.ok) {
-      return { notFound: true };
+
+      return {
+        props: {
+          product: null,
+          error: "We couldn’t load this product right now. Please try again.",
+        },
+      };
     }
 
     const product = await res.json();
@@ -32,6 +38,7 @@ export async function getServerSideProps(context) {
     };
   }
 }
+
 
 export default function ProductDetailPage({ product, error }) {
   const { addItem } = useCart();
