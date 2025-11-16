@@ -4,6 +4,8 @@ import Filters from "../components/Filters";
 import SearchBar from "../components/SearchBar";
 import SkeletonCard from "../components/SkeletonCard";
 import { useCart } from "../context/CartContext";
+import { toast, Slide } from "react-toastify";
+
 
 export default function HomePage() {
   const { addItem } = useCart();
@@ -15,7 +17,7 @@ export default function HomePage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [visibleCount, setVisibleCount] = useState(15);
   const [loadingMore, setLoadingMore] = useState(false);
 
   const sentinelRef = useRef(null);
@@ -56,7 +58,7 @@ export default function HomePage() {
     };
   }, [fetchError, initialLoading]);
 
-  // 🔹 Retry button
+  // Retry button
   const handleRetry = async () => {
     try {
       setInitialLoading(true);
@@ -122,9 +124,13 @@ export default function HomePage() {
       price: product.price,
       image: product.image,
     });
+
+    toast.success("Added to cart!", {
+    transition: Slide
+  });
   }
 
-  // Error State – only show the centered card
+  // Error State
   if (fetchError && !initialLoading) {
     return (
       <div className="page">
@@ -187,7 +193,7 @@ export default function HomePage() {
 
             {initialLoading ? (
               <div className="product-grid">
-                {Array.from({ length: 8 }).map((_, i) => (
+                {Array.from({ length: 10 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))}
               </div>

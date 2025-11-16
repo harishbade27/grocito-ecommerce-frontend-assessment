@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useCart } from "../../context/CartContext";
 import SkeletonProductDetail from "../../components/SkeletonProductDetail";
+import { toast, Slide } from "react-toastify";
+
 
 export default function ProductDetailPage() {
   const router = useRouter();
@@ -47,6 +49,8 @@ export default function ProductDetailPage() {
       price: product.price,
       image: product.image,
     });
+
+    toast.success("Added to cart!", { transition: Slide });
   };
 
 
