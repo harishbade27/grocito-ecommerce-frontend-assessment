@@ -1,4 +1,3 @@
-// components/Layout.jsx
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
 import { useState } from "react";
